@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "themes-web",
+  "description": "Themes MCP workflows for image and video generation.",
+  "owner": {
+    "name": "Themes"
+  },
+  "plugins": [
+    {
+      "name": "themes-mcp",
+      "description": "Themes image and video generation workflows with compact MCP payloads, durable references, and grid-first results.",
+      "source": "./themes-mcp",
+      "category": "creativity",
+      "homepage": "https://mcp.themegen.ai"
+    }
+  ]
+}

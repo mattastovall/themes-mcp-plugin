@@ -1,0 +1,20 @@
+{
+  "name": "themes-web",
+  "interface": {
+    "displayName": "Themes Web"
+  },
+  "plugins": [
+    {
+      "name": "themes-mcp",
+      "source": {
+        "source": "local",
+        "path": "./themes-mcp"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Creativity"
+    }
+  ]
+}

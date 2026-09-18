@@ -1,0 +1,4 @@
+interface:
+  display_name: "Themes"
+  short_description: "Generate and inspect media with Themes"
+  default_prompt: "Use Themes for compact, reference-aware image and video generation, and surface the existing grid result when available."

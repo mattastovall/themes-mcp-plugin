@@ -1,0 +1,20 @@
+{
+  "name": "themes-mcp",
+  "version": "0.1.0",
+  "description": "Themes image and video generation workflows with compact MCP payloads, durable references, and grid-first results.",
+  "author": {
+    "name": "Themes",
+    "url": "https://www.themegen.ai"
+  },
+  "homepage": "https://mcp.themegen.ai",
+  "keywords": [
+    "themes",
+    "image-generation",
+    "video-generation",
+    "mcp",
+    "creative-workflows"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "mcpServers": "./.mcp.json"
+}
