@@ -1,6 +1,6 @@
 {
   "name": "themes-mcp",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Themes image and video generation workflows with compact MCP payloads, durable references, and grid-first results.",
   "author": {
     "name": "Themes",

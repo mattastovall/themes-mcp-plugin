@@ -36,3 +36,7 @@ is included for repository hosting later.
 Authentication happens when the host first connects to the MCP server. The
 plugin intentionally does not configure a bearer header or copy image bytes
 into tool arguments.
+
+The shared skill also covers sequence-scoped editorial work: Fountain and
+storyboard revisions, labeled shot batches, explicit candidate selection,
+After Effects delivery approval, and asynchronous JSON/CSV/PDF exports.
