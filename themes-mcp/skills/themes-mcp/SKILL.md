@@ -137,6 +137,14 @@ offline.
 - Use `themes_render_generation_grid` only to reopen an existing thread when no
   generation, revision, character-sheet, or grid-generation tool ran in the
   current turn.
+- A chained edit pass made with separate `themes_generate` calls is unbatched.
+  For each step, pass exactly the prior successful step's `media.imageUrl` as
+  the next `referenceImagesUrl` value; do not use a thread preview, a stale
+  thumbnail, a request ID, or a different generation's URL. After a retry,
+  continue from the explicitly chosen successful source, not the failed result.
+  The generation grid must show the newest unbatched chain when it is newer than
+  completed batches; use Show all generations if comparing it with an older
+  batch.
 - Use `themes_generate_as_grid` only when the user wants one contact-sheet image
   split into cells. It is not the tool for browsing a thread.
 - For a storyboard batch, wait for HTTPS media in every slot, then call

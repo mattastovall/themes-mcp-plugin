@@ -1,7 +1,6 @@
 {
   "mcpServers": {
     "themes": {
-      "type": "http",
       "url": "https://mcp.themegen.ai"
     }
   }

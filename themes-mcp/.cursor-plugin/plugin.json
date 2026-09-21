@@ -13,5 +13,6 @@
   "category": "integrations",
   "tags": ["mcp", "image-generation", "video-generation"],
   "skills": "./skills/",
-  "commands": "./commands/"
+  "commands": "./commands/",
+  "mcpServers": "./mcp.json"
 }

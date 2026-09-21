@@ -13,11 +13,18 @@ For Cursor, install or copy this folder to
 bundled MCP server. Older Cursor versions can also use the same `themes` entry
 in `~/.cursor/mcp.json`.
 
+The bundled Cursor manifest explicitly points at `mcp.json`. The server entries
+use Cursor's portable URL form (`url` only); do not add a `type: "http"` field.
+For local debugging, copy the `themes-dev` entry from `mcp.dev.json` into
+Cursor's MCP settings instead of replacing the hosted `themes` entry.
+
 For local MCP debugging, run `bun run mcp:dev` and add the separate
 `themes-dev` entry from `mcp.dev.json` to Cursor. It listens on
 `http://127.0.0.1:3010/api/mcp`, while OAuth uses the canonical
 `https://mcp.themegen.ai` audience so the hosted Themes consent page can issue
-a token the local verifier accepts. Production remains the `themes` server at
+a token the local verifier accepts. Protected-resource metadata remains local
+for Cursor compatibility; this audience is an explicit development alias, not
+a production auth bypass. Production remains the `themes` server at
 `https://mcp.themegen.ai`. Set `THEMES_MCP_DEV_OAUTH_RESOURCE` only when your
 development environment has a different trusted HTTPS audience.
 
