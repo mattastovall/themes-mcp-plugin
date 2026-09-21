@@ -1,0 +1,17 @@
+{
+  "name": "themes-mcp",
+  "displayName": "Themes MCP",
+  "version": "0.1.3",
+  "description": "Themes image and video generation workflows with compact MCP payloads, durable references, and grid-first results.",
+  "author": {
+    "name": "Themes",
+    "url": "https://www.themegen.ai"
+  },
+  "homepage": "https://mcp.themegen.ai",
+  "license": "MIT",
+  "keywords": ["themes", "image-generation", "video-generation", "mcp", "creative-workflows"],
+  "category": "integrations",
+  "tags": ["mcp", "image-generation", "video-generation"],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
