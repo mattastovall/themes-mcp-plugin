@@ -14,5 +14,5 @@
   "tags": ["mcp", "image-generation", "video-generation"],
   "skills": "./skills/",
   "commands": "./commands/",
-  "mcpServers": "./mcp.json"
+  "mcpServers": "./mcp.cursor.json"
 }

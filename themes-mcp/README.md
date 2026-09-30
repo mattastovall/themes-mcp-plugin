@@ -1,10 +1,10 @@
 # Themes MCP plugin
 
-One package for Cursor, Codex, and Claude Code. It installs the authenticated Themes MCP
+One package for Cursor, Codex, Claude Code, and OpenCode. It installs the authenticated Themes MCP
 server plus a shared workflow skill that keeps generation results grid-first and
 prevents duplicate references, duplicate widgets, and oversized inline payloads.
 
-The plugin registers the `themes` server from `mcp.json` and connects to
+The plugin registers the `themes` server and connects to
 `https://mcp.themegen.ai` using the host's OAuth flow. It contains no API keys
 and does not bundle the legacy bot server.
 
@@ -13,8 +13,22 @@ For Cursor, install or copy this folder to
 bundled MCP server. Older Cursor versions can also use the same `themes` entry
 in `~/.cursor/mcp.json`.
 
-The bundled Cursor manifest explicitly points at `mcp.json`. The server entries
-use Cursor's portable URL form (`url` only); do not add a `type: "http"` field.
+## Manifest layout
+
+| File | Consumer |
+| --- | --- |
+| `plugin.json` + `mcp.json` | Portable Agent Plugins package (OpenAI). OpenAI presentation metadata lives under `extensions.com.openai.interface`; `mcp.json` requires `type: "streamable-http"`. |
+| `.codex-plugin/plugin.json` + `.mcp.json` | Codex compatibility fallback. Ignored by hosts that read the root `extensions.com.openai` block. |
+| `.claude-plugin/plugin.json` + `.mcp.json` | Claude Code. |
+| `.cursor-plugin/plugin.json` + `mcp.cursor.json` | Cursor. |
+| `opencode.json` | OpenCode (copy the `mcp.themes` entry into your config). |
+
+Keep `name`, `version`, and the endpoint identical across manifests;
+`scripts/__tests__/themes-mcp-cursor-plugin.test.mjs` enforces this.
+
+The bundled Cursor manifest explicitly points at `mcp.cursor.json`, not the
+portable `mcp.json`, because Cursor's server entries use the portable URL form
+(`url` only); do not add a `type` field to `mcp.cursor.json`.
 For local debugging, copy the `themes-dev` entry from `mcp.dev.json` into
 Cursor's MCP settings instead of replacing the hosted `themes` entry.
 
@@ -61,3 +75,21 @@ into tool arguments.
 The shared skill also covers sequence-scoped editorial work: Fountain and
 storyboard revisions, labeled shot batches, explicit candidate selection,
 After Effects delivery approval, and asynchronous JSON/CSV/PDF exports.
+
+## OpenCode
+
+Add the `themes` entry from `opencode.json` to `opencode.json` in your project
+or to `~/.config/opencode/opencode.json`, then authenticate:
+
+```sh
+opencode mcp auth themes
+opencode mcp list
+```
+
+OpenCode discovers OAuth from the server's `401` challenge and protected-resource
+metadata, then registers itself with Dynamic Client Registration (RFC 7591)
+against the Supabase authorization server. Do not set `oauth` unless you
+pre-register a client. If the flow fails, `opencode mcp debug themes` shows
+which discovery step broke. As of 2026-09-30 production metadata advertises a
+`registration_endpoint`; a full browser sign-in and consent has not been
+verified from OpenCode itself.
