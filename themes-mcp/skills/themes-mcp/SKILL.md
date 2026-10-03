@@ -175,8 +175,31 @@ offline.
 - Use `ref:<id>` / `referenceId` for owned stills.
 - Do not substitute row IDs, UUID request IDs, provider IDs, `unique_id`, or
   batch IDs for either identity type.
-- Search and inspect a saved Theme only when the user explicitly names or asks
-  to apply it. “Use Themes” means use the product, not attach a saved Theme.
+- Search and inspect when the user asks to find, compare, or apply saved Themes
+  or LoRAs, names one, or provides a Theme UUID. “Use Themes” means use the
+  product; attachment of a saved Theme remains opt-in.
+
+## Saved Themes and LoRAs
+
+1. Use `themes_search_themes` with the user's search terms. For H3 LoRAs use
+   `loraOnly: true`, `loraFamily: minimax-h3`, `output: video`, and
+   `loraModality: video`. Supply `videoInputMode` for text-to-video,
+   image-to-video, or reference-to-video. A truncated result is incomplete;
+   refine the search before making catalog-wide claims.
+2. Inspect the selected UUID with `themes_inspect_theme` using the intended
+   output and model/reference context. Set `hasReferenceVideo` or
+   `hasReferenceAudio` for those references, including mixed image/video inputs.
+   Read description, `lora.triggerWords`, scale, usage notes, and compatibility.
+   Treat source sampler/steps as notes, not automatically supported controls.
+3. When attachment is requested, send `themeSelection` containing `themeId` and
+   `snapshotHash: snapshot.hash` to generation. Omit `modelId` to use the
+   Theme's required route, or select its inspected target for the actual inputs.
+   `referenceToVideoTargetModel` is the video/audio-reference route. The server
+   resolves the file and scale; never construct a provider LoRA URL.
+4. Use applicable trigger words naturally in the requested prompt. Preserve
+   the inspected hash; after drift, inspect again before dispatch. Poll the
+   returned request rather than resubmitting a paid operation.
+
 
 ## Editing and character continuity
 
