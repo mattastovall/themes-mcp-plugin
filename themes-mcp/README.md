@@ -139,3 +139,18 @@ shell v5 retain their previous resource URI aliases for existing conversations.
 The sidebar/tab entrypoints require the updated MCP server to be deployed and
 the host's tool catalog to refresh. Updating the plugin ZIP alone does not add
 them to an already-connected server.
+
+## Durable requests and inspection (0.2.0)
+
+Thread restoration includes an attributed request ledger and private revisioned
+view state. The Requests view searches retained server history; feed search only
+filters loaded media. Default agent context is capped near 2,000 tokens, mixing
+recent intent and relevant older requests. Automatic routing considers substantive
+activity within 24 hours and creates a new thread for ambiguous matches. Explicit
+accessible threads and exact generation/request/batch links remain usable at any age.
+
+Video inspectors load metadata first. Explicit Analyze video requests prepare up
+to eight timestamped frames through the media inspection worker. MCP agents inspect
+returned evidence themselves; web analysis uses the configured server analyzer.
+Sampling does not establish complete motion continuity or audio content. Draft
+restoration never authorizes or submits a revision. Grid v23 retains earlier aliases.
