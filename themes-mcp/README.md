@@ -93,3 +93,49 @@ pre-register a client. If the flow fails, `opencode mcp debug themes` shows
 which discovery step broke. As of 2026-09-30 production metadata advertises a
 `registration_endpoint`; a full browser sign-in and consent has not been
 verified from OpenCode itself.
+
+## Branding and schema support (0.1.4)
+
+The portable manifest and Codex compatibility overlay both reference the bundled
+Themes logo (`assets/themes-icon.png`) and composer icon (`assets/themes-icon.svg`).
+These are copies of the application's existing `public/apple-touch-icon.png` and
+`public/favicon.svg`; the brand color is `#FF7E1D`. The package keeps the same name,
+MCP endpoint, OAuth connection, and default prompts.
+
+The server supports MCP `2026-07-28` (`server/discover`, per-request metadata,
+matching method/name headers, stateless results) alongside legacy `2025-11-25`
+initialization. Tool input and supported output schemas use JSON Schema 2020-12.
+Modern responses carry the server's title, website, and icons in serverInfo metadata.
+Only implemented capabilities are advertised; optional subscriptions, sampling,
+elicitation, and tasks are not advertised as supported.
+
+After deploying the server update, its public OpenAPI 3.2.1 description is available
+at `https://mcp.themegen.ai/mcp/openapi.json`. It is built directly from the MCP tool
+contracts and describes the real JSON-RPC `POST /` endpoint, OAuth bearer challenge,
+protocol headers, notifications, and errors. Tool names are documented in
+`x-mcp-tools` with input schemas and the stable output schemas currently published
+by `tools/list`; they are not separate REST routes. OpenAPI tools that only accept
+3.0 schemas need a compatible importer; do not downgrade schemas by relabeling them.
+
+Updating this directory or producing an archive does not deploy the server or
+refresh an installed host's plugin cache. Use the existing release/install flow
+for the target host, then reconnect to refresh its tool catalog.
+
+## Pinned media workspace (0.1.5)
+
+`themes_open_workspace` accepts `{}` and declares both global and thread OpenAI
+MCP App entrypoints, with the title **Media workspace** and a monochrome sidebar
+icon. Opening it lists only the connected account's owned threads, with search
+and pagination. Selecting a thread opens its existing gallery without generating
+media or spending credits; **All threads** returns to the workspace.
+
+Both resource contents and MCP Apps initialization declare `inline` and
+`fullscreen` display modes. **Expand workspace** requests fullscreen from the
+host; **Compact view** returns to inline. The views use the mode actually granted
+by the host and follow subsequent host-context notifications. Fullscreen uses a
+scrollable viewport rather than growing the inline card. Grid v20 and sequence
+shell v5 retain their previous resource URI aliases for existing conversations.
+
+The sidebar/tab entrypoints require the updated MCP server to be deployed and
+the host's tool catalog to refresh. Updating the plugin ZIP alone does not add
+them to an already-connected server.
