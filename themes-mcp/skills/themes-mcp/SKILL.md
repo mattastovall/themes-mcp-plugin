@@ -22,8 +22,9 @@ identity, references, batches, and grid state.
   preserve `bulkRowIndex` for ordering; do not encode shot/frame numbering in
   prompts. Four or more distinct prompts belong in one
   `themes_generate_batch` call.
-- Normal tool results are metadata-first and media URLs are HTTPS. Only
-  vision/grid tools should attach pixels for inspection. Do not put image
+- Normal tool results are metadata-first and media URLs are HTTPS. Vision/grid tools attach pixels for inspection. An explicit show-image request
+  uses `themes_get_generation_details` with `includeImage: true` and exactly one
+  `generationRef` to return native image content; ordinary detail reads stay compact. Do not put image
   bytes, base64, or large serialized results in MCP JSON.
 - Adobe tools operate through the authenticated account gateway, never a
   direct host socket. Writes require the session/document/opaque target
