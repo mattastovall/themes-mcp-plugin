@@ -124,7 +124,7 @@ for the target host, then reconnect to refresh its tool catalog.
 ## Pinned media workspace (0.1.5)
 
 `themes_open_workspace` accepts `{}` and declares both global and thread OpenAI
-MCP App entrypoints, with the title **Media workspace** and a monochrome sidebar
+MCP App entrypoints, with the title **Themes** and a monochrome sidebar
 icon. Opening it lists only the connected account's owned threads, with search
 and pagination. Selecting a thread opens its existing gallery without generating
 media or spending credits; **All threads** returns to the workspace.
