@@ -125,6 +125,18 @@ and useful revisions when inspection supports them. Use
 `themes_get_generation_details` for saved settings or measured metadata;
 requested resolution is not measured resolution.
 
+Normal results belong in the grid; do not repeat them as Markdown image embeds.
+When the user explicitly requests inline images, call
+`themes_get_generation_details` with `includeImage: true` and exactly one
+`generationRef` per call, then surface the native image attachment. For several
+requested images, use one read-only call per image. If attachments cannot be
+shown, use the already-mounted grid. If neither surface is available, provide
+exact `media.imageUrl` links. URL previews must use the exact original
+`media.imageUrl`, never `media.thumbnailUrl`; thumbnails may not be ready.
+Never reconstruct, truncate, or abbreviate media URLs. A missing attachment or
+failed preview does not authorize regeneration.
+
+
 ## Specialized workflows
 
 Read only the relevant supporting file before using these workflows:
