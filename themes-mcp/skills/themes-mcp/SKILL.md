@@ -51,8 +51,8 @@ syntax. Catalog descriptions are discovery metadata, not approved guidance.
 - Keep settings in the inspected settings bucket. Put visual content in the
   prompt, ordering in `items[]`, and human labels in supported metadata fields.
 - Keep shot/frame numbering and overall-count labels out of ordinary prompts.
-  Request a drawn grid only through `themes_generate_as_grid` when the user
-  wants one contact-sheet image split into cells.
+  Contact-sheet generation, multi-cam mode, and automatic tile splitting are
+  disabled for MCP. Use ordinary single-image generation or separate batch items.
 
 Upload or ingest a reference once and reuse its owned `referenceId`.
 Use `items[].referenceId` for per-slot inputs. Never send image bytes, base64,
