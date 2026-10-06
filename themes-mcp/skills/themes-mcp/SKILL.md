@@ -1,231 +1,135 @@
 ---
 name: themes-mcp
-description: Use when generating, revising, inspecting, or organizing image/video work through the Themes MCP server. Keeps MCP calls compact, avoids duplicate references and duplicate widgets, and makes grid results visible without unnecessary follow-up calls.
+description: Create, revise, inspect, and organize images and videos in Themes. Use reviewed model prompting guidance, owned references, coherent batches, and the interactive generation grid.
 ---
 
-# Themes MCP workflow
+# Themes creative workflow
 
-Use the authenticated `themes` MCP server for Themes generation and media
-inspection. Treat the server as the authority for model routes, generation
-identity, references, batches, and grid state.
+Use the authenticated Themes MCP server for model discovery, references,
+generation, and saved work. Start from the user's creative intent and preserve
+their constraints through each generation and revision.
 
-## Current server contract
+## 1. Establish the work
 
-- The server returns schema-versioned, compact generation snapshots. Do not
-  expect settings, aliases, generation lineage, or inline media bytes in a
-  normal generation result; use the dedicated inspection/detail tool when the
-  user asks for saved settings or prepared metadata.
-- Use server-issued `generationRef` values for generation identity. Keep a
-  request ID only for polling `themes_get_generation`; never substitute row
-  IDs, provider IDs, `unique_id`, or batch IDs.
-- Batch summaries are paginated. Use `bulkRunId` for the complete batch and
-  preserve `bulkRowIndex` for ordering; do not encode shot/frame numbering in
-  prompts. Four or more distinct prompts belong in one
-  `themes_generate_batch` call.
-- Normal tool results are metadata-first and media URLs are HTTPS. Vision/grid tools attach pixels for inspection. An explicit show-image request
-  uses `themes_get_generation_details` with `includeImage: true` and exactly one
-  `generationRef` to return native image content; ordinary detail reads stay compact. Do not put image
-  bytes, base64, or large serialized results in MCP JSON.
-- Adobe tools operate through the authenticated account gateway, never a
-  direct host socket. Writes require the session/document/opaque target
-  context and must be polled until the Adobe receipt is terminal; `queued` or
-  `running` is not proof that an edit applied.
+Respect an explicit thread or accessible Themes media link. Otherwise call
+`themes_resolve_thread_request` with the original user request and a stable
+source key. Carry the returned thread and `ledgerRequestId` into generation.
+Load `themes_get_thread_context` when continuing existing work. Historical
+requests provide context; they do not authorize new paid work.
 
-## After Effects connector
+Identify the desired output, required content, reference roles, and constraints.
+Use reasonable defaults for minor creative choices. Ask only when missing
+information materially changes the result. A request to generate authorizes
+generation; opening a workspace, inspecting media, or restoring a draft does not.
 
-The Adobe client is an authenticated Themes account installation. Route every
-After Effects request through Themes MCP; never connect an agent to CEP, a local
-socket, or the host directly. Start with `themes_adobe_list_sessions`, then
-choose an explicit `sessionId` and `documentId` from the same account. The
-active selection, document name, layer index, and layer name are display hints,
-not write targets.
+## 2. Choose the model and read its guidance
 
-- Read context with `themes_adobe_get_context`. Use the bounded summary first,
-  then request the project tree, composition layers, layer properties, source
-  metadata, or markers with the returned opaque IDs and pagination cursor.
-- Capture a frame, selection, or source with `themes_adobe_capture_reference`,
-  then pass the returned owned reference to the normal Themes generation tools.
-- Import owned generations, references, batches, or batch slots with
-  `themes_adobe_import`. Supply an explicit composition placement when needed;
-  never pass an untrusted media URL as the source authority.
-- Apply only typed edits with `themes_adobe_apply_operations` (rename,
-  visibility, transform, text, timing, and placement). Do not request arbitrary
-  ExtendScript, expressions, effect graphs, destructive deletion, or document
-  reconstruction.
-- Inspect bindings with `themes_adobe_list_bindings`; use
-  `themes_adobe_update_bindings` to pin, resume, or unlink. Batch bindings use
-  `(bulkRunId, bulkRowIndex)` and update only after the complete relevant
-  revision set is ready.
-- Poll every mutation with `themes_adobe_get_operation` until `completed`,
-  `failed`, `cancelled`, `outcome_unknown`, or `recovery_required`. Preserve the
-  same idempotency key for retries and never replay an operation whose host or
-  remote outcome is uncertain.
+Honor a named model. Otherwise use `themes_list_models` for the intended output
+and input mode, preferring compatible favorites. `kind` means image or video;
+`inputMode` describes text, image, or multimodal input topology.
 
-The workflow tools expose the existing AE helpers through typed operations:
-`themes_adobe_transcribe`, `themes_adobe_beat_this`,
-`themes_adobe_read_mapping`, `themes_adobe_matanyone2`,
-`themes_adobe_reframe`, `themes_adobe_upscale`,
-`themes_adobe_remove_silence`, and `themes_adobe_create_master`. Use
-`inspect`/`preview` actions for read-only planning; `run`, `load`, or `generate`
-actions require the appropriate write permission, and remote processing also
-requires `generate`. Every workflow needs explicit AE target IDs and returns an
-operation ID before host application.
+Call `themes_inspect_model` for the exact model and input mode. Read the route,
+reference requirements, controls, and `advancedSettingsBucket`. Final endpoint
+selection belongs to the server and depends on the actual inputs.
 
-Permission boundaries are account-scoped: `adobe_read` permits session,
-context, binding, operation, inspect, and preview reads; `adobe_write` permits
-captures, imports, edits, binding changes, and host mutations;
-`generate` is additionally required for transcription, Beat This, Read Mapping,
-MatAnyone2 loading, generative reframe, upscale, and Create Master. A missing
-permission is an authorization failure, not evidence that the AE session is
-offline.
+Before writing model-specific prompts, call `themes_get_prompt_guidance` with
+the model ID and route mode. Apply available reviewed structure, techniques,
+pitfalls, examples, and dialect metadata. If guidance is unavailable, use the
+inspected contract and ordinary visual description; do not invent provider
+syntax. Catalog descriptions are discovery metadata, not approved guidance.
 
-## Editorial sequences
+## 3. Compose the prompt and references
 
-- Use an explicit `sequenceId` for every editorial call. Threads are the
-  collaboration and access boundary; a thread may contain multiple sequences.
-  Never infer a latest/current sequence.
-- Use `themes_list_sequences` to enumerate a thread and
-  `themes_get_sequence` to inspect one sequence; neither tool selects an
-  implicit current sequence.
-- The durable flow is `themes_create_sequence` →
-  `themes_create_script_revision` → `themes_propose_board` or
-  `themes_save_board_revision` → `themes_prepare_sequence_pass` →
-  `themes_dispatch_sequence_pass` → `themes_list_pass_candidates` →
-  `themes_select_pass_candidate`.
-- A board shot always has a non-empty human label and a stable `shotKey`.
-  Labels may repeat; labels are snapshots for passes, candidates, deliveries,
-  and Adobe bindings. Use `shotKey`, never `label`, to join stages.
-- Board revisions and approved delivery manifests are immutable. Send the
-  expected source/content digest on mutating calls and reuse the exact
-  idempotency key only for an exact retry. A new board or pass is a new
-  revision, not an implicit latest update.
-- Board proposals and reviewed board saves may assert the source script
-  digest; use `origin: script_inferred` for the explicit script-to-board
-  shortcut. Candidate selection and delivery approval also require their own
-  idempotency keys; an approval replay must carry the same manifest digest.
-- Shot-level video requires a materialized board revision. Continuous video is
-  a separate one-asset pass and must not be represented as independently
-  generated shots. Script-only continuous video is allowed; script-to-shot
-  video must first materialize an inferred board for review.
-- `themes_prepare_sequence_pass` is no-spend and preserves `sequenceId`,
-  `passId`, source revision IDs, `shotKey`, label snapshots, `preparedBatchId`,
-  and `bulkRunId`. Dispatch may spend balance and is owner-authorized; review
-  all prepared prompts/warnings before dispatch.
-- Delivery is staged: prepare, owner approve the exact `manifestDigest`, then
-  execute through the authenticated AE gateway. The default is `new_master`;
-  `existing_comp` requires an explicit AE comp target. Poll
-  `themes_get_delivery` until every import, master-comp, placement, and
-  read-back receipt is terminal. `automatic`, `pinned`, and `unlinked` binding
-  policies remain meaningful; pinned/unlinked bindings must not be silently
-  replaced.
-- External HTTPS board references must become owned references before later
-  generation or Adobe work. Durable identity is the owned reference or
-  `generationRef`, never a URL. No audio generation/mixing is implied by the
-  editorial metadata in v1.
-- Use `themes_export_sequence` for the asynchronous sequence bundle and poll
-  it with `themes_get_sequence_export`. Exports must preserve both `shotKey`
-  and every historical label snapshot, including script, board, pass,
-  candidate, delivery, provenance, and media digests. A successful export
-  contains `sequence.json`, `shot-list.csv`, `shooting-script.txt`, and a
-  readable `shooting-script.pdf`; use only the returned short-lived signed
-  URL and never reconstruct storage keys.
+- Describe concrete subject, action, setting, composition, lighting, and style
+  where relevant. For video, describe how action and camera movement unfold.
+  Include sound only when requested and supported by the inspected route.
+- Preserve exact requested text and explicit exclusions. Guidance helps express
+  the request; it does not override the user's creative choices.
+- Explain what each reference controls: identity, layout, appearance, or a
+  starting/ending frame. Use supported reference fields rather than inventing
+  image-index tokens or unsupported syntax.
+- Keep settings in the inspected settings bucket. Put visual content in the
+  prompt, ordering in `items[]`, and human labels in supported metadata fields.
+- Keep shot/frame numbering and overall-count labels out of ordinary prompts.
+  Request a drawn grid only through `themes_generate_as_grid` when the user
+  wants one contact-sheet image split into cells.
 
-## Result and grid behavior
+Upload or ingest a reference once and reuse its owned `referenceId`.
+Use `items[].referenceId` for per-slot inputs. Never send image bytes, base64,
+data URLs, or large serialized responses as MCP arguments.
 
-- A generation tool that returns widget metadata already opens the grid. Surface
-  that result to the user; do not call `themes_render_generation_grid` again in
-  the same turn.
-- Use `themes_render_generation_grid` only to reopen an existing thread when no
-  generation, revision, character-sheet, or grid-generation tool ran in the
-  current turn.
-- A chained edit pass made with separate `themes_generate` calls is unbatched.
-  For each step, pass exactly the prior successful step's `media.imageUrl` as
-  the next `referenceImagesUrl` value; do not use a thread preview, a stale
-  thumbnail, a request ID, or a different generation's URL. After a retry,
-  continue from the explicitly chosen successful source, not the failed result.
-  The generation grid must show the newest unbatched chain when it is newer than
-  completed batches; use Show all generations if comparing it with an older
-  batch.
-- Use `themes_generate_as_grid` only when the user wants one contact-sheet image
-  split into cells. It is not the tool for browsing a thread.
-- For a storyboard batch, wait for HTTPS media in every slot, then call
-  `themes_compose_vision_grid` with the returned `bulkRunId`, followed by
-  `themes_interpret_media`. Do this before declaring the batch visually done.
-- For existing stills or references, compose a labeled vision grid and interpret
-  it. Do not send the same stills to a second vision model.
+For saved Themes or LoRAs, search with `themes_search_themes`, then inspect the
+selected UUID with `themes_inspect_theme` for the actual model and inputs.
+Attach only when requested, using `themeSelection` with `themeId` and the
+inspected `snapshot.hash`. Apply relevant trigger words and inspected scale
+notes; never construct provider LoRA URLs. “Use Themes” names the product and
+does not itself request a saved Theme attachment.
 
-## Compact payload rules
+For H3 LoRAs, search with `loraOnly: true`, `loraFamily: minimax-h3`,
+`output: video`, `loraModality: video`, and the intended `videoInputMode`.
+Inspect video/audio reference compatibility. Reinspect if the snapshot drifts.
 
-- Never put host image bytes, base64, data URLs, or large serialized tool
-  responses in MCP JSON arguments.
-- For owned stills, use the upload/commit flow and pass `referenceId` values.
-  Use `items[].referenceId` for per-slot image-to-image inputs.
-- Reuse one canonical owned reference per image. Do not repeat equivalent signed
-  URLs, mirrored URLs, or lineage metadata in every generation.
-- For four or more distinct prompts, use one `themes_generate_batch` call. Do
-  not loop `themes_generate`.
-- Preserve idempotency keys for exact retries. A new independent pass gets a
-  new key; never replay a paid generation with a fresh key by accident.
-- Prefer the structured result and its media links. Only pixel-inspection tools
-  need image content attached by the server; normal history and generation
-  results should stay link- and metadata-based.
+## 4. Generate and wait
 
-## Identity and references
+Use one `themes_generate_batch` call for four or more distinct prompts.
+`numImages` repeats one prompt; it does not represent distinct shots.
+For a direct batch, show a table of item numbers and prompts before dispatch.
+Wait for approval only when the user requested a review gate. Check each prompt
+against their request, references, and chosen look before sending it.
 
-- Use the server-issued `generationRef` for generations.
-- Use `ref:<id>` / `referenceId` for owned stills.
-- Do not substitute row IDs, UUID request IDs, provider IDs, `unique_id`, or
-  batch IDs for either identity type.
-- Search and inspect when the user asks to find, compare, or apply saved Themes
-  or LoRAs, names one, or provides a Theme UUID. “Use Themes” means use the
-  product; attachment of a saved Theme remains opt-in.
+Give each independent request a distinct idempotency key. Preserve the key and
+unchanged payload for exact retries. Poll `themes_get_generation` using the
+returned request ID; never submit another generation merely to poll. A queued
+receipt is not ready media. Reconcile uncertain outcomes before another spend.
+Retry failed bulk slots on the original key; completed slots must not be spent
+again. Preserve batch identity and `bulkRowIndex` ordering.
 
-## Saved Themes and LoRAs
+Use server-issued `generationRef` values for generations and `referenceId`
+values for owned references. Request IDs are for polling. Row IDs, provider
+IDs, `unique_id`, and batch IDs do not substitute for generation identity.
 
-1. Use `themes_search_themes` with the user's search terms. For H3 LoRAs use
-   `loraOnly: true`, `loraFamily: minimax-h3`, `output: video`, and
-   `loraModality: video`. Supply `videoInputMode` for text-to-video,
-   image-to-video, or reference-to-video. A truncated result is incomplete;
-   refine the search before making catalog-wide claims.
-2. Inspect the selected UUID with `themes_inspect_theme` using the intended
-   output and model/reference context. Set `hasReferenceVideo` or
-   `hasReferenceAudio` for those references, including mixed image/video inputs.
-   Read description, `lora.triggerWords`, scale, usage notes, and compatibility.
-   Treat source sampler/steps as notes, not automatically supported controls.
-3. When attachment is requested, send `themeSelection` containing `themeId` and
-   `snapshotHash: snapshot.hash` to generation. Omit `modelId` to use the
-   Theme's required route, or select its inspected target for the actual inputs.
-   `referenceToVideoTargetModel` is the video/audio-reference route. The server
-   resolves the file and scale; never construct a provider LoRA URL.
-4. Use applicable trigger words naturally in the requested prompt. Preserve
-   the inspected hash; after drift, inspect again before dispatch. Poll the
-   returned request rather than resubmitting a paid operation.
+## 5. Inspect and revise
 
+A generation result with widget metadata already opens the grid. Surface it
+without opening a duplicate. Use `themes_render_generation_grid` to reopen
+existing work only when no generation, revision, character-sheet, or grid tool
+has run in the current turn.
 
-## Editing and character continuity
+For a storyboard batch, wait for HTTPS media in every slot, compose a labeled
+vision grid with `themes_compose_vision_grid`, then use `themes_interpret_media`
+before claiming visual completion. For existing stills, use that same inspection
+path rather than sending the stills to a second vision model.
 
-- For source boards: ingest or upload once, attach references once, compose and
-  interpret before dispatching edits.
-- For character consistency: resolve a hero still and character sheet first,
-  then use the returned `characterTokens`. Do not treat arbitrary grid cells as
-  character identity.
-- Revise failed cells with `themes_revise_batch_items` in the original batch;
-  do not create a new fragment batch.
+Revise failed cells with `themes_revise_batch_items` in the original batch.
+State what should change and what should remain consistent. For character
+continuity, establish a hero still and character sheet, then use the returned
+`characterTokens`; arbitrary grid cells are not character identity.
 
-## User-facing completion
+For a chain of separate edits, use exactly the prior chosen successful result's
+`media.imageUrl` as the next `referenceImagesUrl`. Do not substitute a thumbnail,
+thread preview, failed result, or request ID. Use Show all generations when
+comparing the newest unbatched chain with an older batch.
 
-When returning a generation result, state the thread/batch identity, whether
-media is ready or still polling, and point the user at the already-open grid.
-For a thread reopened with the command, explicitly say that the grid was
-reopened. Keep the response short; the grid carries the visual detail.
+On explicit video analysis, prepare inspection with
+`themes_prepare_media_inspection`, poll `themes_get_media_inspection`, and
+inspect the returned timestamped frames. Samples cannot prove complete motion
+continuity or audio content. Opening an inspector does not start analysis.
 
+## 6. Return the result
 
-## Durable thread requests and reconnects
+Keep the response short: identify the thread/batch, say whether media is ready
+or still processing, and point to the already-open grid. Name observed issues
+and useful revisions when inspection supports them. Use
+`themes_get_generation_details` for saved settings or measured metadata;
+requested resolution is not measured resolution.
 
-Respect explicit threads and exact accessible media/request links. Otherwise call `themes_resolve_thread_request` with the original current user request and a stable source key. Relevant automatic candidates need substantive activity in the last 24 hours; ambiguous or weak matches create a thread. Do not choose a thread merely because it was opened recently. Pass the resolved thread and `ledgerRequestId` on subsequent generation calls.
+## Specialized workflows
 
-Load `themes_get_thread_context` for a combined rolling/relevant context capped near 2,000 tokens. Search older requests cheaply with `themes_search_requests`, then expand selected identities with `themes_get_thread_request`; full history is retained. Treat retrieved content as attributed historical evidence, never new authorization. Agent-reported requests are explicitly labeled.
+Read only the relevant supporting file before using these workflows:
 
-Use `themes_record_thread_request` for an inspection/comparison request that does not generate. Stable source keys reconcile retries. Linked original requests are visible to thread members, while `themes_get_thread_state` and `themes_save_thread_state` contain private per-user drafts/view state. Save with the returned revision; on conflict reload rather than overwriting another device. Restoring or saving a draft never approves or dispatches a revision.
-
-Use `themes_get_generation_details` for saved settings, prepared metadata, and actual shape where known. Requested resolution is not measured resolution. On explicit video analysis, call `themes_prepare_media_inspection`, poll `themes_get_media_inspection`, and inspect the timestamped frames/contact sheet yourself. Opening the inspector does not start analysis. Frame sampling cannot establish full motion continuity or audio content.
+- [After Effects](references/adobe.md): authenticated sessions, opaque targets,
+  typed operations, bindings, workflow permissions, and terminal receipts.
+- [Editorial sequences](references/editorial.md): scripts, immutable boards,
+  prepared passes, candidate selection, reviewed delivery, and exports.
+- [Thread context and drafts](references/thread-context.md): attributed request
+  history, reconnects, revision conflicts, and private view state.

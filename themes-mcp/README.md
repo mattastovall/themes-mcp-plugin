@@ -154,3 +154,7 @@ to eight timestamped frames through the media inspection worker. MCP agents insp
 returned evidence themselves; web analysis uses the configured server analyzer.
 Sampling does not establish complete motion continuity or audio content. Draft
 restoration never authorizes or submits a revision. Grid v23 retains earlier aliases.
+
+## Prompting ergonomics
+
+The shared skill starts with the creative workflow and explicitly fetches reviewed model prompting guidance. Supporting files hold After Effects, editorial, and thread-state details. Model inspection includes bounded, route-specific approved summaries and full-guide fetch arguments after the server update is deployed. The plugin skill remains compatible with older servers because it calls the existing guidance tool directly.
