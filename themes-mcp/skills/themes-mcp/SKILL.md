@@ -93,6 +93,7 @@ IDs, `unique_id`, and batch IDs do not substitute for generation identity.
 Generation, character preparation, confirmation, revision, and polling return
 metadata without opening an inline panel. After dispatch, call
 `themes_render_generation_grid` once with the returned thread ID to show it.
+For a batch, pass its returned `bulkRunId` to display that exact pass.
 Do not open the workspace or render intermediate character setup and polling.
 The mounted grid refreshes its thread. Open another panel only when the user
 explicitly asks to reopen or switch work.
