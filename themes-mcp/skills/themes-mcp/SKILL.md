@@ -90,10 +90,12 @@ IDs, `unique_id`, and batch IDs do not substitute for generation identity.
 
 ## 5. Inspect and revise
 
-A generation result with widget metadata already opens the grid. Surface it
-without opening a duplicate. Use `themes_render_generation_grid` to reopen
-existing work only when no generation, revision, character-sheet, or grid tool
-has run in the current turn.
+Generation, character preparation, confirmation, revision, and polling return
+metadata without opening an inline panel. After dispatch, call
+`themes_render_generation_grid` once with the returned thread ID to show it.
+Do not open the workspace or render intermediate character setup and polling.
+The mounted grid refreshes its thread. Open another panel only when the user
+explicitly asks to reopen or switch work.
 
 For a storyboard batch, wait for HTTPS media in every slot, compose a labeled
 vision grid with `themes_compose_vision_grid`, then use `themes_interpret_media`
