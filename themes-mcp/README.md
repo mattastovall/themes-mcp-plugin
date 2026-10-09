@@ -44,6 +44,78 @@ development environment has a different trusted HTTPS audience.
 
 ## Local development
 
+### ChatGPT web and mobile package
+
+The direct-MCP marketplace package and the registered ChatGPT connection are
+separate installations. A desktop marketplace install does not prove the skill
+is installed in ChatGPT web. For a private/workspace cloud package, bundle the
+same skill and assets with a registered ChatGPT app dependency:
+
+```sh
+node scripts/package-themes-chatgpt-plugin.mjs \
+  --app-id asdk_app_6aa36a849d788191925da16e3c8d7e6d \
+  --name themes-mcp-cloud \
+  --version 0.2.6 \
+  --output artifacts/themes-chatgpt-cloud-plugin-0.2.6.zip
+```
+
+That app ID was verified against the connected Themes ChatGPT listing and its
+installed `.app.json` on 2026-10-07. Verify its availability in the destination
+workspace before publishing; a personal connection does not grant organization
+access. The generator adds `extensions.com.openai.apps: "./.app.json"` and the
+matching compatibility declaration. It retains the skill, references, icons,
+identity, and presentation, and excludes direct MCP configs and local commands.
+The existing desktop/portable package is unchanged.
+
+The cloud package was published and installed on ChatGPT web on 2026-10-07:
+
+- Plugin: `Plugin_94604821a6688191be32adba0bf428a1`
+- Release: `pluginrel_6ac66e8ac0cc8191b2fa0fb873aca2c1`, version `0.2.6`
+- Scope: private workspace plugin
+- [Web listing](https://chatgpt.com/plugins/Plugin_94604821a6688191be32adba0bf428a1)
+
+The new package name avoids the existing external-import `themes-mcp` identity.
+The web listing offers Try in chat, the skill opens in the browser, and the web
+composer selects Themes. The app-backed entry remains the underlying connection
+dependency; its display name is now Themes and its description matches the product.
+Update this cloud plugin by its exact plugin
+ID and freshly retrieved current release ID; do not create another copy.
+
+### Cloud branding verification
+
+Version 0.2.6 includes the existing 180 × 180 orange Themes PNG for `logo`,
+`composerIcon`, and both dark variants, with manifest and assets at the ZIP root.
+The workspace admin's Upload new version flow preserved the Themes developer
+name; the earlier Plugin Creator upload normalized it to the account owner.
+Keep using that admin upload flow for this branded cloud package.
+
+The consumer listing currently shows Themes as developer and version 0.2.6, but
+still selects an inline generic SVG instead of the packaged orange logo. This is
+not a confirmed icon repair. The stored release contains the referenced PNG,
+and the hosted MCP's existing icon URLs return HTTP 200. Refresh tools completed,
+but did not repair the connected app's icon. Connection settings expose name and
+description editors only; its admin detail page reports access unavailable.
+The remaining icon registration/rendering issue is in the ChatGPT hosting path,
+with its exact cause unconfirmed. Verify the actual rendered orange icon before
+claiming branding complete; another source-only metadata edit is insufficient.
+
+Update an eligible existing cloud plugin with the archive and its current
+release ID. Externally imported/Git-managed listings cannot be overwritten with
+Plugin Creator; use their owning release process if it supports cloud packages,
+or explicitly create a separate private/workspace cloud plugin. Do not assume
+changing files converts the existing imported listing's installation type.
+For an overlay update, remove previously uploaded direct MCP configs through the
+supported deletion mechanism; simply omitting them from a ZIP does not delete them.
+
+After publication, verify that the web listing offers installation or Try in
+chat, shows both the Themes app and the `themes-mcp` skill, and that a new web
+chat can invoke the skill and list references without generating. Verify mobile
+separately. Packaging alone does not establish either host's behavior.
+
+This bound archive is for private/workspace use, not public-directory submission.
+Public submission uses the original portable MCP endpoint package and the
+Developer Portal's With MCP flow. See [OpenAI packaging documentation](https://developers.openai.com/plugins/build/plugins).
+
 Claude Code:
 
 ```sh
