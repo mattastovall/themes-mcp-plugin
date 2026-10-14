@@ -1,6 +1,6 @@
 {
   "name": "themes-mcp",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Themes image and video generation workflows with compact MCP payloads, durable references, and grid-first results.",
   "author": {
     "name": "Themes",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "Themes",
     "shortDescription": "Create images and videos",
-    "longDescription": "Compact, grid-first image and video generation workflows through the authenticated Themes MCP server.",
+    "longDescription": "Generate and inspect images and videos, then import owned media into After Effects through the authenticated Themes MCP server.",
     "developerName": "Themes",
     "category": "Creativity",
     "capabilities": [
@@ -32,7 +32,7 @@
     "defaultPrompt": [
       "Generate a set of images in Themes and show me the grid",
       "Inspect these references and create a coherent image batch",
-      "Create a contact sheet from this Themes thread"
+      "Import this edit into a new After Effects composition"
     ],
     "brandColor": "#FF7E1D",
     "screenshots": [],

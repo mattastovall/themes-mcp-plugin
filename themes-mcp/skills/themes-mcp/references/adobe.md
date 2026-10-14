@@ -38,6 +38,35 @@ actions require the appropriate write permission, and remote processing also
 requires `generate`. Every workflow needs explicit AE target IDs and returns an
 operation ID before host application.
 
+`themes_adobe_create_master` uploads and transcribes audio/video sources, then
+assembles takes around shared spoken script lines. Do not use it to create a
+plain composition from a rendered edit. Import the owned asset with
+`themes_adobe_import` and `targetId: null`, poll its receipt to completion, then
+use its returned `itemId` as `ae-item-<itemId>` in
+`themes_adobe_apply_operations`:
+
+```json
+{"type":"create_composition","targetId":"ae-item-240","compName":"Rendered edit"}
+```
+
+Use the explicit session/document and a distinct idempotency key for this
+second command. The connected panel must advertise `host.create_composition`.
+This local operation matches the imported video's width, height, pixel aspect
+ratio, frame rate and duration, and adds it at time zero with embedded audio.
+It requires `adobe_write`, without transcription, upload or `generate`.
+Poll `themes_adobe_get_operation` to completion; its result contains
+`createdCompositions` with the new `compId`, `layerId`, `sourceTargetId` and
+composition metadata. Stills, audio-only sources and stale item IDs are rejected.
+If an operation has an uncertain outcome, reconcile its existing receipt rather
+than creating another composition with a fresh key.
+
+The migrated panel still calls legacy processing endpoints for Create Master,
+including `/api/transcribe/upload-url` and `/api/adobe/create-master`. This
+Themes checkout does not implement those routes. Themes OAuth tokens are
+deliberately rejected on non-gateway API routes, so an upload 401 can indicate
+this routing gap rather than an expired login. Reauthentication or loosening
+the middleware allowlist does not supply the missing workflow backend.
+
 Permission boundaries are account-scoped: `adobe_read` permits session,
 context, binding, operation, inspect, and preview reads; `adobe_write` permits
 captures, imports, edits, binding changes, and host mutations;
