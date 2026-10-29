@@ -1,12 +1,12 @@
 ---
 name: themes-mcp
-description: Create, revise, inspect, and organize images and videos in Themes. Use reviewed model prompting guidance, owned references, coherent batches, and the interactive generation grid.
+description: Create, revise, inspect, and organize images, videos, and per-thread Markdown documents in Themes. Use reviewed model prompting guidance, owned references, coherent batches, and the interactive generation grid.
 ---
 
 # Themes creative workflow
 
 Use the authenticated Themes MCP server for model discovery, references,
-generation, and saved work. Start from the user's creative intent and preserve
+generation, per-thread Markdown files, and saved work. Start from the user's creative intent and preserve
 their constraints through each generation and revision.
 
 ## 1. Establish the work
@@ -21,6 +21,10 @@ Identify the desired output, required content, reference roles, and constraints.
 Use reasonable defaults for minor creative choices. Ask only when missing
 information materially changes the result. A request to generate authorizes
 generation; opening a workspace, inspecting media, or restoring a draft does not.
+
+## Thread Markdown files
+
+For document work, read [Thread Markdown operations](references/thread-context.md#saved-markdown-documents) before editing. These tools also work in the in-app chat agent. Use `themes_list_thread_files` to discover user documents, then `themes_read_thread_file` before editing. Preserve the stored `# Purpose` section and Markdown formatting; pass the current `version` on every edit, replacement, rename or delete. On conflict re-read and reconcile, never overwrite with a guessed newer revision. The complete document is limited to 256 KiB UTF-8, including Purpose. Generated `context.md` and media notes are separate and read-only. Use `themes_download_thread_file` for the saved result; a browser download path requires a browser session, not MCP OAuth. Do not apply media-generation steps to a file-only request.
 
 ## 2. Choose the model and read its guidance
 
@@ -149,4 +153,4 @@ Read only the relevant supporting file before using these workflows:
 - [Editorial sequences](references/editorial.md): scripts, immutable boards,
   prepared passes, candidate selection, reviewed delivery, and exports.
 - [Thread context and drafts](references/thread-context.md): attributed request
-  history, reconnects, revision conflicts, and private view state.
+  history, per-thread Markdown list/read/create/edit/replace/rename/download/delete operations, Purpose sections, revision conflicts, and private view state.
