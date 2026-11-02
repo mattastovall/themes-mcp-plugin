@@ -85,6 +85,11 @@ Give each independent request a distinct idempotency key. Preserve the key and
 unchanged payload for exact retries. Poll `themes_get_generation` using the
 returned request ID; never submit another generation merely to poll. A queued
 receipt is not ready media. Reconcile uncertain outcomes before another spend.
+For stalled or long-pending work, read [Stalled generation and recovery](references/recovery.md).
+Inspect `createdAt`, `dispatch.state`, `dispatch.stalled`, `recoveryAction`, and
+correlated `providerRequests`. A durable queued slot resumes through the worker;
+an unknown outcome requires reconciliation. Neither pending nor an empty
+provider-job list proves that work was never submitted or billed.
 Retry failed bulk slots on the original key; completed slots must not be spent
 again. Preserve batch identity and `bulkRowIndex` ordering.
 

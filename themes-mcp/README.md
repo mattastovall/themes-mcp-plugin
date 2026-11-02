@@ -1,5 +1,12 @@
 # Themes MCP plugin
 
+Source version 0.2.7 adds stalled-job recovery guidance. New MCP batches use a
+durable dispatch queue after the matching server migrations/deployment; pending
+work is inspected by request ID rather than restarted with a new paid batch.
+The packaged guidance distinguishes queued, uncertain and provider-confirmed
+work, and keeps local downloads separate from saved Themes/grid results.
+Updating this source does not update an installed cloud release automatically.
+
 One package for Cursor, Codex, Claude Code, and OpenCode. It installs the authenticated Themes MCP
 server plus a shared workflow skill that keeps generation results grid-first and
 prevents duplicate references, duplicate widgets, and oversized inline payloads.
@@ -7,6 +14,11 @@ prevents duplicate references, duplicate widgets, and oversized inline payloads.
 The plugin registers the `themes` server and connects to
 `https://mcp.themegen.ai` using the host's OAuth flow. It contains no API keys
 and does not bundle the legacy bot server.
+
+For an administrator-managed shared connection without member Themes accounts,
+see [organization connections](../../docs/implementation/mcp-organization-connections.md).
+That is a separate, opt-in transport; these default plugin declarations continue
+to use individual OAuth. Never put an organization key in this package.
 
 For Cursor, install or copy this folder to
 `~/.cursor/plugins/local/themes-mcp/`, then reload Cursor so it registers the
