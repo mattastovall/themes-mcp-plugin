@@ -149,6 +149,10 @@ Never reconstruct, truncate, or abbreviate media URLs. A missing attachment or
 failed preview does not authorize regeneration.
 
 
+## Story productions
+
+For character-driven narrative ads, animated explainers, staged still-to-motion review or resumable production handoff, read `../story-production/SKILL.md`. Its explicit still-review checkpoint applies to that workflow; ordinary generation retains the scope and approval rules above.
+
 ## Specialized workflows
 
 Read only the relevant supporting file before using these workflows:

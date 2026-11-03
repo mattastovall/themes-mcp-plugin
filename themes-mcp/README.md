@@ -1,5 +1,8 @@
 # Themes MCP plugin
 
+Source version 0.3.0 adds the opt-in `story-production` skill: brief and coverage planning, cast/set continuity, pilot stills, user-reviewed motion, and resumable verification/handoff. The production tools and native review board require the matching server deployment and database migration. Installing the package alone does not enable them.
+
+
 Source version 0.2.7 adds stalled-job recovery guidance. New MCP batches use a
 durable dispatch queue after the matching server migrations/deployment; pending
 work is inspected by request ID rather than restarted with a new paid batch.
