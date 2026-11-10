@@ -153,6 +153,16 @@ failed preview does not authorize regeneration.
 
 For character-driven narrative ads, animated explainers, staged still-to-motion review or resumable production handoff, read `../story-production/SKILL.md`. Its explicit still-review checkpoint applies to that workflow; ordinary generation retains the scope and approval rules above.
 
+## Voice library
+
+Call `themes_voices_browse` to open the inline ElevenLabs picker. Search owned
+account voices or the public library. Selection sends a `Use this voice`
+message; it does not apply a voice, create speech, add a library voice, or
+approve a paid operation. `themes_voice_preview` is widget-internal and returns
+existing sample bytes as private widget metadata — never synthesize a missing
+sample. An ElevenLabs `voiceId` is not a Theme ID, generationRef, or
+`referenceId`.
+
 ## Specialized workflows
 
 Read only the relevant supporting file before using these workflows:
